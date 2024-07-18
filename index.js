@@ -6,7 +6,8 @@ module.exports = function multimd_table_plugin(md, options) {
     multiline:  false,
     rowspan:    false,
     headerless: false,
-    multibody:  true
+    multibody:  true,
+    autolabel:  true
   };
   options = md.utils.assign({}, defaults, options || {});
 
@@ -21,7 +22,7 @@ module.exports = function multimd_table_plugin(md, options) {
         head = state.bMarks[line] + state.blkIndent,
         end = state.skipSpacesBack(state.eMarks[line], head),
         bounds = [], pos, posjump,
-        escape = false, code = false;
+        escape = false, code = false, serial = 0;
 
     /* Scan for valid pipe character position */
     for (pos = start; pos < end; pos++) {
@@ -33,8 +34,12 @@ module.exports = function multimd_table_plugin(md, options) {
           /* make \` closes the code sequence, but not open it;
              the reason is that `\` is correct code block */
           /* eslint-disable-next-line brace-style */
-          if (posjump > pos) { pos = posjump; }
-          else if (code || !escape) { code = !code; }
+          if (posjump > pos) {
+            if (!code) {
+              if (serial === 0) { serial = posjump - pos; } else if (serial === posjump - pos) { serial = 0; }
+            }
+            pos = posjump;
+          } else if (code || (!escape && !serial)) { code = !code; }
           escape = false; break;
         case 0x7c /* | */:
         case 0x2016 /* ‖ */:
@@ -57,14 +62,17 @@ module.exports = function multimd_table_plugin(md, options) {
     var meta = { text: null, label: null },
         start = state.bMarks[line] + state.sCount[line],
         max = state.eMarks[line],
-        capRE = /^\[([^\[\]]+)\](\[([^\[\]]+)\])?\s*$/,
+        /* A non-greedy qualifier allows the label to be matched */
+        capRE = /^\[(.+?)\](\[([^\[\]]+)\])?\s*$/,
         matches = state.src.slice(start, max).match(capRE);
 
     if (!matches) { return false; }
     if (silent)  { return true; }
-    // TODO eliminate capRE by simple checking
 
     meta.text  = matches[1];
+
+    if (!options.autolabel && !matches[2]) { return meta; }
+
     meta.label = matches[2] || matches[1];
     meta.label = meta.label.toLowerCase().replace(/\W+/g, '');
 
@@ -155,7 +163,8 @@ module.exports = function multimd_table_plugin(md, options) {
         colspan, leftToken,
         rowspan, upTokens = [],
         tableLines, tgroupLines,
-        tag, text, range, r, c, b;
+        tag, text, range, r, c, b, t,
+        blockState;
 
     if (startLine + 2 > endLine) { return false; }
 
@@ -267,7 +276,21 @@ module.exports = function multimd_table_plugin(md, options) {
     if (tableToken.meta.cap) {
       token          = state.push('caption_open', 'caption', 1);
       token.map      = tableToken.meta.cap.map;
-      token.attrs    = [ [ 'id', tableToken.meta.cap.label ] ];
+
+      var attrs      = [];
+      var capSide    = tableToken.meta.cap.first ? 'top' : 'bottom';
+
+      /* Null is possible when disabled the option autolabel */
+      if (tableToken.meta.cap.label !== null) {
+        attrs.push([ 'id', tableToken.meta.cap.label ]);
+      }
+
+      /* Add caption-side inline-CSS to <caption> tag, if caption is below the markdown table. */
+      if (capSide !== 'top') {
+        attrs.push([ 'style', 'caption-side: ' + capSide ]);
+      }
+
+      token.attrs    = attrs;
 
       token          = state.push('inline', '', 0);
       token.content  = tableToken.meta.cap.text;
@@ -325,18 +348,26 @@ module.exports = function multimd_table_plugin(md, options) {
 
         /* Multiline. Join the text and feed into markdown-it blockParser. */
         if (options.multiline && trToken.meta.multiline && trToken.meta.mbounds) {
-          text = [ text.trimRight() ];
+          // Pad the text with empty lines to ensure the line number mapping is correct
+          text = new Array(trToken.map[0]).fill('').concat([ text.trimRight() ]);
           for (b = 1; b < trToken.meta.mbounds.length; b++) {
             /* Line with N bounds has cells indexed from 0 to N-2 */
             if (c > trToken.meta.mbounds[b].length - 2) { continue; }
             range = [ trToken.meta.mbounds[b][c] + 1, trToken.meta.mbounds[b][c + 1] ];
             text.push(state.src.slice.apply(state.src, range).trimRight());
           }
-          state.md.block.parse(text.join('\n'), state.md, state.env, state.tokens);
+          blockState = new state.md.block.State(text.join('\n'), state.md, state.env, []);
+          blockState.level = trToken.level + 1;
+          // Start tokenizing from the actual content (trToken.map[0])
+          state.md.block.tokenize(blockState, trToken.map[0], blockState.lineMax);
+          for (t = 0; t < blockState.tokens.length; t++) {
+            state.tokens.push(blockState.tokens[t]);
+          }
         } else {
           token          = state.push('inline', '', 0);
           token.content  = text.trim();
           token.map      = trToken.map;
+          token.level    = trToken.level + 1;
           token.children = [];
         }
 

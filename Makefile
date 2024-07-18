@@ -1,13 +1,7 @@
-.PHONY: lint test coverage test-ci browserify
-
-NPM_PACKAGE := $(shell node -e 'process.stdout.write(require("./package.json").name)')
-NPM_VERSION := $(shell node -e 'process.stdout.write(require("./package.json").version)')
-
-REMOTE_NAME ?= origin
-REMOTE_REPO ?= $(shell git config --get remote.${REMOTE_NAME}.url)
-GITHUB_PROJ := https://github.com/jppellet/markdown-it-multimd-table-ext
+.PHONY: lint test coverage report-coveralls browserify
 
 MODULE_PATH := ./node_modules/.bin
+export PATH := ${MODULE_PATH}:$(PATH)
 
 
 ${MODULE_PATH}: package.json
@@ -16,26 +10,17 @@ ${MODULE_PATH}: package.json
 
 
 lint: ${MODULE_PATH}
-	${MODULE_PATH}/eslint .
+	eslint . --ignore-pattern support
 
 test: ${MODULE_PATH} lint
-	${MODULE_PATH}/mocha -R spec
+	nyc mocha
 
 coverage: ${MODULE_PATH} lint
-	${MODULE_PATH}/istanbul cover ${MODULE_PATH}/_mocha
+	nyc report --reporter html
 
-test-ci: ${MODULE_PATH} lint
-	# For Github integration test. You should use `make coverage` on local.
-	${MODULE_PATH}/istanbul cover ${MODULE_PATH}/_mocha --report lcovonly -- -R spec
-	cat ./coverage/lcov.info | ${MODULE_PATH}/coveralls
-	rm -rf ./coverage
+report-coveralls: ${MODULE_PATH} lint
+	# For coverage test. You can use `make coverage` on local.
+	nyc --reporter=lcov mocha
 
 browserify: ${MODULE_PATH} lint test
-	# Browserify
-	( printf "/*! ${NPM_PACKAGE} ${NPM_VERSION} ${GITHUB_PROJ} @license MIT */"; \
-		${MODULE_PATH}/browserify . -s markdownitMultimdTable \
-		) > dist/markdown-it-multimd-table-ext.js
-	# Minify
-	${MODULE_PATH}/terser dist/markdown-it-multimd-table-ext.js -b beautify=false,ascii_only=true -c -m \
-		--preamble "/*! ${NPM_PACKAGE} ${NPM_VERSION} ${GITHUB_PROJ} @license MIT */" \
-		> dist/markdown-it-multimd-table-ext.min.js
+	rollup -c support/rollup.config.js

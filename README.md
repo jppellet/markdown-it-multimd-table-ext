@@ -2,9 +2,9 @@
 
 <br>
 
+<!-- [![GitHub Action](https://github.com/redbug312/markdown-it-multimd-table/workflows/Node.js/badge.svg)](https://github.com/redbug312/markdown-it-multimd-table/actions) -->
 [![NPM version](https://img.shields.io/npm/v/markdown-it-multimd-table-ext.svg?style=flat)](https://www.npmjs.org/package/markdown-it-multimd-table-ext)
-<!-- [![Build Status](https://travis-ci.org/RedBug312/markdown-it-multimd-table.svg?branch=master)](https://travis-ci.org/RedBug312/markdown-it-multimd-table) -->
-<!-- [![Coverage Status](https://coveralls.io/repos/github/RedBug312/markdown-it-multimd-table/badge.svg?branch=master)](https://coveralls.io/github/RedBug312/markdown-it-multimd-table?branch=master) -->
+<!-- [![Coverage Status](https://coveralls.io/repos/redbug312/markdown-it-multimd-table/badge.svg?branch=master&service=github)](https://coveralls.io/github/redbug312/markdown-it-multimd-table?branch=master) -->
 
 MultiMarkdown table syntax plugin for markdown-it markdown parser
 
@@ -56,6 +56,8 @@ var md = require('markdown-it')()
               multiline:  false,
               rowspan:    false,
               headerless: false,
+              multibody:  true,
+              autolabel:  true,
             });
 
 md.render(/*...*/)
@@ -65,7 +67,7 @@ For a quick demo:
 ```javascript
 $ mkdir markdown-it-multimd-table-ext
 $ cd markdown-it-multimd-table-ext
-$ npm install markdown-it-multimd-table-ext --prefix .
+$ npm install markdown-it markdown-it-multimd-table-ext --prefix .
 $ vim test.js
 
     var md = require('markdown-it')()
@@ -130,7 +132,9 @@ Here's the table expected on browser:
 Noted that GitHub filters out `style` property, so the example uses `align` the
 obsolete one. However it outputs `style="text-align: ..."` in actual.
 
-### Multiline (optional)
+## Options
+
+### Multiline
 
 Backslash at end merges with line content below.<br>
 Feature contributed by [Lucas-C](https://github.com/Lucas-C).
@@ -192,7 +196,7 @@ This is parsed below when the option enabled:
 </tbody>
 </table>
 
-### Rowspan (optional)
+### Rowspan
 
 `^^` indicates cells being merged above.<br>
 Feature contributed by [pmccloghrylaing](https://github.com/pmccloghrylaing).
@@ -253,7 +257,7 @@ This is parsed below when the option enabled:
 </tbody>
 </table>
 
-### Headerless (optional)
+### Headerless
 
 Table header can be eliminated.
 
@@ -356,7 +360,17 @@ This is parsed below when the option enabled:
 </tbody>
 </table>
 
-## Vertical Alignment
+### Multibody
+
+An empty line separates consecutive table bodies. When disabled, an empty line
+always cuts off the tables.
+
+### Autolabel
+
+Table `id` attribute follows the table caption if not labeled. When disabled,
+caption without labels cannot generate the attribute.
+
+### Vertical Alignment
 
 Description to be completed.
 

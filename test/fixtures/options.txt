@@ -261,7 +261,8 @@ square.</p>
 <tr>
 <td>
 <pre><code>for i in range(5):
-    print('*' * i)</code></pre>
+    print('*' * i)
+</code></pre>
 </td>
 <td>
 <p>Print a
@@ -592,6 +593,34 @@ A paragraph contains pipes (|).
 <tr>
 <td>7</td>
 <td>8</td>
+</tr>
+</tbody>
+</table>
+.
+
+
+autolabel: create table caption id even if not labeled
+AGAINST note 7 if disabled
+
+
+[Issue #50](https://github.com/redbug312/markdown-it-multimd-table/issues/50)
+Table not labeled with autolabel disabled
+.
+| --- | --- |
+| 1   | 2   |
+| 3   | 4   |
+[nolabel]
+.
+<table>
+<caption style="caption-side: bottom">nolabel</caption>
+<tbody>
+<tr>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3</td>
+<td>4</td>
 </tr>
 </tbody>
 </table>
