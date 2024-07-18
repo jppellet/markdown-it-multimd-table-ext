@@ -10,17 +10,17 @@ ${MODULE_PATH}: package.json
 
 
 lint: ${MODULE_PATH}
-	eslint . --ignore-pattern support
+	npx eslint . --ignore-pattern support
 
 test: ${MODULE_PATH} lint
-	nyc mocha
+	npx nyc mocha
 
 coverage: ${MODULE_PATH} lint
-	nyc report --reporter html
+	npx nyc report --reporter html
 
 report-coveralls: ${MODULE_PATH} lint
 	# For coverage test. You can use `make coverage` on local.
-	nyc --reporter=lcov mocha
+	npx nyc --reporter=lcov mocha
 
 browserify: ${MODULE_PATH} lint test
-	rollup -c support/rollup.config.js
+	npx rollup -c support/rollup.config.js

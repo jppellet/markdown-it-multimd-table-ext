@@ -1,17 +1,17 @@
-import nodeResolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
+import nodeResolve from '@rollup/plugin-node-resolve';
 import nodePolyfills from 'rollup-plugin-node-polyfills';
-import pkg from '../package.json';
 import { terser } from 'rollup-plugin-terser';
+import pkg from '../package.json';
 
 export default {
   input: 'index.js',
   output: [
     {
-      file: 'dist/markdown-it-multimd-table.js',
+      file: 'dist/markdown-it-multimd-table-ext.js',
       format: 'umd',
-      name: 'markdownitMultimdTable',
+      name: 'markdownitMultimdTableExt',
       plugins: [
         // Here terser is used only to force ascii output
         terser({
@@ -27,9 +27,9 @@ export default {
       ]
     },
     {
-      file: 'dist/markdown-it-multimd-table.min.js',
+      file: 'dist/markdown-it-multimd-table-ext.min.js',
       format: 'umd',
-      name: 'markdownitMultimdTable',
+      name: 'markdownitMultimdTableExt',
       plugins: [
         terser({
           format: {
