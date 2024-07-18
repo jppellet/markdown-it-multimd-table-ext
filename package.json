@@ -1,5 +1,5 @@
 {
-  "name": "markdown-it-multimd-table",
+  "name": "markdown-it-multimd-table-ext",
   "version": "4.1.1",
   "description": "Multimarkdown table syntax plugin for markdown-it markdown parser",
   "keywords": [
@@ -9,15 +9,15 @@
     "multimarkdown",
     "table"
   ],
-  "homepage": "https://github.com/RedBug312/markdown-it-multimd-table",
+  "homepage": "https://github.com/jppellet/markdown-it-multimd-table-ext",
   "repository": {
     "type": "git",
-    "url": "git://github.com/RedBug312/markdown-it-multimd-table.git"
+    "url": "git://github.com/jppellet/markdown-it-multimd-table-ext.git"
   },
   "bugs": {
-    "url": "https://github.com/RedBug312/markdown-it-multimd-table/issues"
+    "url": "https://github.com/redbug312/markdown-it-multimd-table/issues"
   },
-  "author": "RedBug312",
+  "author": "RedBug312 and jppellet",
   "license": "MIT",
   "main": "index.js",
   "scripts": {

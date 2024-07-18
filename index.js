@@ -37,6 +37,7 @@ module.exports = function multimd_table_plugin(md, options) {
           else if (code || !escape) { code = !code; }
           escape = false; break;
         case 0x7c /* | */:
+        case 0x2016 /* ‖ */:
           if (!code && !escape) { bounds.push(pos); }
           escape = false; break;
         default:
@@ -97,10 +98,10 @@ module.exports = function multimd_table_plugin(md, options) {
   }
 
   function table_separator(state, silent, line) {
-    var meta = { aligns: [], wraps: [] },
+    var meta = { aligns: [], valigns: [], wraps: [] },
         bounds = scan_bound_indices(state, line),
-        sepRE = /^:?(-+|=+):?\+?$/,
-        c, text, align;
+        sepRE = /^:?(\^|v)?(-+|=+):?\+?$/,
+        c, text, align, first;
 
     /* Only separator needs to check indents */
     if (state.sCount[line] - state.blkIndent >= 4) { return false; }
@@ -111,13 +112,22 @@ module.exports = function multimd_table_plugin(md, options) {
       if (!sepRE.test(text)) { return false; }
 
       meta.wraps.push(text.charCodeAt(text.length - 1) === 0x2B/* + */);
-      align = ((text.charCodeAt(0) === 0x3A/* : */) << 4) |
+      first = text.charCodeAt(0);
+      align = ((first === 0x3A/* : */) << 4) |
                (text.charCodeAt(text.length - 1 - meta.wraps[c]) === 0x3A);
       switch (align) {
         case 0x00: meta.aligns.push('');       break;
         case 0x01: meta.aligns.push('right');  break;
         case 0x10: meta.aligns.push('left');   break;
         case 0x11: meta.aligns.push('center'); break;
+      }
+      align = text.charCodeAt((first === 0x3A/* : */) ? 1 : 0);
+      if (align === 0x5E/* ^ */) {
+        meta.valigns.push('top');
+      } else if (align === 0x76/* v */) {
+        meta.valigns.push('bottom');
+      } else {
+        meta.valigns.push('');
       }
     }
     if (silent) { return true; }

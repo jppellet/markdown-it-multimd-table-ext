@@ -5,7 +5,7 @@ NPM_VERSION := $(shell node -e 'process.stdout.write(require("./package.json").v
 
 REMOTE_NAME ?= origin
 REMOTE_REPO ?= $(shell git config --get remote.${REMOTE_NAME}.url)
-GITHUB_PROJ := https://github.com/RedBug312/markdown-it-multimd-table
+GITHUB_PROJ := https://github.com/jppellet/markdown-it-multimd-table-ext
 
 MODULE_PATH := ./node_modules/.bin
 
@@ -34,8 +34,8 @@ browserify: ${MODULE_PATH} lint test
 	# Browserify
 	( printf "/*! ${NPM_PACKAGE} ${NPM_VERSION} ${GITHUB_PROJ} @license MIT */"; \
 		${MODULE_PATH}/browserify . -s markdownitMultimdTable \
-		) > dist/markdown-it-multimd-table.js
+		) > dist/markdown-it-multimd-table-ext.js
 	# Minify
-	${MODULE_PATH}/terser dist/markdown-it-multimd-table.js -b beautify=false,ascii_only=true -c -m \
+	${MODULE_PATH}/terser dist/markdown-it-multimd-table-ext.js -b beautify=false,ascii_only=true -c -m \
 		--preamble "/*! ${NPM_PACKAGE} ${NPM_VERSION} ${GITHUB_PROJ} @license MIT */" \
-		> dist/markdown-it-multimd-table.min.js
+		> dist/markdown-it-multimd-table-ext.min.js

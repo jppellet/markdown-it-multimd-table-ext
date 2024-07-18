@@ -1,6 +1,10 @@
-[![NPM version](https://img.shields.io/npm/v/markdown-it-multimd-table.svg?style=flat)](https://www.npmjs.org/package/markdown-it-multimd-table)
-[![Build Status](https://travis-ci.org/RedBug312/markdown-it-multimd-table.svg?branch=master)](https://travis-ci.org/RedBug312/markdown-it-multimd-table)
-[![Coverage Status](https://coveralls.io/repos/github/RedBug312/markdown-it-multimd-table/badge.svg?branch=master)](https://coveralls.io/github/RedBug312/markdown-it-multimd-table?branch=master)
+**This is a fork of RedBug312's `markdown-it-multimd-table`. Below is the original README, slightly modified.**
+
+<br>
+
+[![NPM version](https://img.shields.io/npm/v/markdown-it-multimd-table-ext.svg?style=flat)](https://www.npmjs.org/package/markdown-it-multimd-table-ext)
+<!-- [![Build Status](https://travis-ci.org/RedBug312/markdown-it-multimd-table.svg?branch=master)](https://travis-ci.org/RedBug312/markdown-it-multimd-table) -->
+<!-- [![Coverage Status](https://coveralls.io/repos/github/RedBug312/markdown-it-multimd-table/badge.svg?branch=master)](https://coveralls.io/github/RedBug312/markdown-it-multimd-table?branch=master) -->
 
 MultiMarkdown table syntax plugin for markdown-it markdown parser
 
@@ -35,16 +39,20 @@ there are weird results for sensible inputs.
 
 [mmd6-table]: https://fletcher.github.io/MultiMarkdown-6/syntax/tables.html
 
+## Build
+
+Use `make browserify`.
+
 ## Usage
 
 ```javascript
 // defaults
 var md = require('markdown-it')()
-            .use(require('markdown-it-multimd-table'));
+            .use(require('markdown-it-multimd-table-ext'));
 
 // full options list (equivalent to defaults)
 var md = require('markdown-it')()
-            .use(require('markdown-it-multimd-table'), {
+            .use(require('markdown-it-multimd-table-ext'), {
               multiline:  false,
               rowspan:    false,
               headerless: false,
@@ -55,13 +63,13 @@ md.render(/*...*/)
 
 For a quick demo:
 ```javascript
-$ mkdir markdown-it-multimd-table
-$ cd markdown-it-multimd-table
-$ npm install markdown-it-multimd-table --prefix .
+$ mkdir markdown-it-multimd-table-ext
+$ cd markdown-it-multimd-table-ext
+$ npm install markdown-it-multimd-table-ext --prefix .
 $ vim test.js
 
     var md = require('markdown-it')()
-                .use(require('markdown-it-multimd-table'));
+                .use(require('markdown-it-multimd-table-ext'));
 
     const exampleTable =
     "|             |          Grouping           || \n" +
@@ -347,6 +355,16 @@ This is parsed below when the option enabled:
 </tr>
 </tbody>
 </table>
+
+## Vertical Alignment
+
+Description to be completed.
+
+Essentially, allows writing stuff like:
+
+    | ^---- | v---- | ---- |
+
+This sets the vertical alignment of the first two column to top and bottom, respectively.
 
 ## Credits
 
