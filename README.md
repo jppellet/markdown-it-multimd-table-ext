@@ -39,10 +39,6 @@ there are weird results for sensible inputs.
 
 [mmd6-table]: https://fletcher.github.io/MultiMarkdown-6/syntax/tables.html
 
-## Build
-
-Use `make browserify`.
-
 ## Usage
 
 ```javascript
@@ -379,6 +375,10 @@ Essentially, allows writing stuff like:
     | ^---- | v---- | ---- |
 
 This sets the vertical alignment of the first two column to top and bottom, respectively.
+
+## Build/Contribute
+
+Use `make browserify`. To publish your fork after updading the package name, use `npm publish`.
 
 ## Credits
 
