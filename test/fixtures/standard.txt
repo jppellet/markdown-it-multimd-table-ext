@@ -761,3 +761,28 @@ And more      | With an escaped '\|'         ||
 And more      | With an escaped '|'         ||
 [Prototype table]</p>
 .
+
+
+Vertical alignment of cells
+.
+| No-Align Col | Top-Aligned Col | Bottom-Aligned Col |
+| ------------ | ^-------------- | v----------------- |
+| Content Cell | Content Cell    | Content Cell       |
+.
+<table>
+<thead>
+<tr>
+<th>No-Align Col</th>
+<th style="vertical-align:top">Top-Aligned Col</th>
+<th style="vertical-align:bottom">Bottom-Aligned Col</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Content Cell</td>
+<td style="vertical-align:top">Content Cell</td>
+<td style="vertical-align:bottom">Content Cell</td>
+</tr>
+</tbody>
+</table>
+.

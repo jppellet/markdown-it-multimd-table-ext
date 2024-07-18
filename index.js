@@ -340,6 +340,9 @@ module.exports = function multimd_table_plugin(md, options) {
         if (tableToken.meta.sep.aligns[c]) {
           token.attrs.push([ 'style', 'text-align:' + tableToken.meta.sep.aligns[c] ]);
         }
+        if (tableToken.meta.sep.valigns[c]) {
+          token.attrs.push([ 'style', 'vertical-align:' + tableToken.meta.sep.valigns[c] ]);
+        }
         if (tableToken.meta.sep.wraps[c]) {
           token.attrs.push([ 'class', 'extend' ]);
         }
