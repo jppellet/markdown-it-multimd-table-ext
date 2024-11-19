@@ -21,12 +21,13 @@ module.exports = function multimd_table_plugin(md, options) {
     var start = state.bMarks[line] + state.sCount[line],
         head = state.bMarks[line] + state.blkIndent,
         end = state.skipSpacesBack(state.eMarks[line], head),
-        bounds = [], pos, posjump,
+        bounds = [], vlines = [], c, pos, posjump,
         escape = false, code = false, serial = 0;
 
     /* Scan for valid pipe character position */
     for (pos = start; pos < end; pos++) {
-      switch (state.src.charCodeAt(pos)) {
+      c = state.src.charCodeAt(pos);
+      switch (c) {
         case 0x5c /* \ */:
           escape = true; break;
         case 0x60 /* ` */:
@@ -43,19 +44,28 @@ module.exports = function multimd_table_plugin(md, options) {
           escape = false; break;
         case 0x7c /* | */:
         case 0x2016 /* ‖ */:
-          if (!code && !escape) { bounds.push(pos); }
+          if (!code && !escape) {
+            bounds.push(pos);
+            vlines.push(c === 0x2016);
+          }
           escape = false; break;
         default:
           escape = false; break;
       }
     }
-    if (bounds.length === 0) return bounds;
+    if (bounds.length === 0) return [ bounds, bounds ];
 
     /* Pad in newline characters on last and this line */
-    if (bounds[0] > head) { bounds.unshift(head - 1); }
-    if (bounds[bounds.length - 1] < end - 1) { bounds.push(end); }
+    if (bounds[0] > head) {
+      bounds.unshift(head - 1);
+      vlines.unshift(false);
+    }
+    if (bounds[bounds.length - 1] < end - 1) {
+      bounds.push(end);
+      vlines.push(false);
+    }
 
-    return bounds;
+    return [ bounds, vlines ];
   }
 
   function table_caption(state, silent, line) {
@@ -81,13 +91,17 @@ module.exports = function multimd_table_plugin(md, options) {
 
   function table_row(state, silent, line) {
     var meta = { bounds: null, multiline: null },
-        bounds = scan_bound_indices(state, line),
+        bounds = scan_bound_indices(state, line), vlines,
         start, pos, oldMax;
+
+    vlines = bounds[1];
+    bounds = bounds[0];
 
     if (bounds.length < 2) { return false; }
     if (silent) { return true; }
 
     meta.bounds = bounds;
+    meta.vlines = vlines;
 
     /* Multiline. Scan boundaries again since it's very complicated */
     if (options.multiline) {
@@ -98,6 +112,8 @@ module.exports = function multimd_table_plugin(md, options) {
         oldMax = state.eMarks[line];
         state.eMarks[line] = state.skipSpacesBack(pos, start);
         meta.bounds = scan_bound_indices(state, line);
+        meta.vlines = meta.bounds[1];
+        meta.bounds = meta.bounds[0];
         state.eMarks[line] = oldMax;
       }
     }
@@ -106,10 +122,13 @@ module.exports = function multimd_table_plugin(md, options) {
   }
 
   function table_separator(state, silent, line) {
-    var meta = { aligns: [], valigns: [], wraps: [] },
+    var meta = { aligns: [], valigns: [], wraps: [], vlines: null },
         bounds = scan_bound_indices(state, line),
         sepRE = /^:?(\^|v)?(-+|=+):?\+?$/,
         c, text, align, first;
+
+    meta.vlines = bounds[1];
+    bounds = bounds[0];
 
     /* Only separator needs to check indents */
     if (state.sCount[line] - state.blkIndent >= 4) { return false; }
@@ -159,11 +178,14 @@ module.exports = function multimd_table_plugin(md, options) {
      */
     var tableDFA = new DFA(),
         grp = 0x10, mtr = -1,
+        alignOverrideRE = /^\[(:-|-:|-|:-:)?[ ,]?(v|\^|=)?\] ?(.*)$/,
+        match,
         token, tableToken, trToken,
         colspan, leftToken,
         rowspan, upTokens = [],
         tableLines, tgroupLines,
-        tag, text, range, r, c, b, t,
+        tag, text, textTrimmed, range, r, c, b, t,
+        halign, valign, style,
         blockState;
 
     if (startLine + 2 > endLine) { return false; }
@@ -326,7 +348,8 @@ module.exports = function multimd_table_plugin(md, options) {
           leftToken.attrSet('colspan', colspan === null ? 2 : colspan + 1);
           continue;
         }
-        if (options.rowspan && upTokens[c] && text.trim() === '^^') {
+        textTrimmed = text.trim();
+        if (options.rowspan && upTokens[c] && textTrimmed === '^^') {
           rowspan = upTokens[c].attrGet('rowspan');
           upTokens[c].attrSet('rowspan', rowspan === null ? 2 : rowspan + 1);
           leftToken = new state.Token('td_th_placeholder', '', 0);
@@ -337,11 +360,49 @@ module.exports = function multimd_table_plugin(md, options) {
         token       = state.push(tag + '_open', tag, 1);
         token.map   = trToken.map;
         token.attrs = [];
-        if (tableToken.meta.sep.aligns[c]) {
-          token.attrs.push([ 'style', 'text-align:' + tableToken.meta.sep.aligns[c] ]);
+
+        halign = tableToken.meta.sep.aligns[c];
+        valign = tableToken.meta.sep.valigns[c];
+
+        match = alignOverrideRE.exec(textTrimmed);
+        if (match) {
+          if (match[1]) {
+            // halign
+            switch (match[1]) {
+              case ':-': halign = 'left'; break;
+              case '-:': halign = 'right'; break;
+              case ':-:': halign = 'center'; break;
+              case '-': default: halign = ''; break;
+            }
+          }
+          if (match[2]) {
+            // valign
+            switch (match[2]) {
+              case '^': valign = 'top'; break;
+              case 'v': valign = 'bottom'; break;
+              case '=': default: valign = 'middle'; break;
+            }
+          }
+          // text
+          text = match[3];
         }
-        if (tableToken.meta.sep.valigns[c]) {
-          token.attrs.push([ 'style', 'vertical-align:' + tableToken.meta.sep.valigns[c] ]);
+
+        style = [];
+        if (halign) {
+          style.push('text-align:' + halign);
+        }
+        if (valign) {
+          style.push('vertical-align:' + valign);
+        }
+        if (tableToken.meta.sep.vlines[c]) {
+          style.push('border-left:1px solid');
+        }
+        if (tableToken.meta.sep.vlines[c + 1]) {
+          style.push('border-right:1px solid');
+        }
+
+        if (style.length) {
+          token.attrs.push([ 'style', style.join(';') ]);
         }
         if (tableToken.meta.sep.wraps[c]) {
           token.attrs.push([ 'class', 'extend' ]);
