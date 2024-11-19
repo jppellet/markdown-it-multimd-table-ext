@@ -1,6 +1,8 @@
-**This is a fork of RedBug312's `markdown-it-multimd-table`. Below is the original README, slightly modified.**
+**This is a fork of RedBug312's `markdown-it-multimd-table`, used in the `bebras` toolchain.***
 
-<br>
+Below is the original README, slightly modified.
+
+<br><hr><br>
 
 <!-- [![GitHub Action](https://github.com/redbug312/markdown-it-multimd-table/workflows/Node.js/badge.svg)](https://github.com/redbug312/markdown-it-multimd-table/actions) -->
 [![NPM version](https://img.shields.io/npm/v/markdown-it-multimd-table-ext.svg?style=flat)](https://www.npmjs.org/package/markdown-it-multimd-table-ext)
@@ -31,6 +33,9 @@ The features are provided:
 - Table caption
 - Block-level elements such as lists, codes... (optional)
 - Omitted table header (optional)
+- Vertical alignment
+- Overridden horizontal and vertical alignment cell by cell
+- More control on lines
 
 Noted that the plugin is not a re-written of MultiMarkdown. This plugin will
 behave differently from the official compiler, but doing its best to obey rules
@@ -368,13 +373,39 @@ caption without labels cannot generate the attribute.
 
 ### Vertical Alignment
 
-Description to be completed.
+Allows setting the vertical alignment of columns with syntax embedded in the separator row.
 
-Essentially, allows writing stuff like:
-
-    | ^---- | v---- | ---- |
+    | Top   | Bottom | Default |
+    | ^---- | v----- | ------- |
 
 This sets the vertical alignment of the first two column to top and bottom, respectively.
+
+### Overridden Alignment
+
+At the beginning of a cell, you can write `[<align>]` to set the alignment of the cell. This overrides the default alignment of the column. Both the horizontal and vertical alignment can be set.
+
+    | Col 1     | Col 2      | Col 3        | Col 4       |
+    | --------- | ---------- | ------------ |------------ |
+    | [^] Top   | [v] Bottom | [=] Middle   | Content     |
+    | [:-] Left | [-:] Right | [:-:] Center | [-] Default |
+
+When specifying both horizontal and vertical alignment, the horizontal alignment should be written first. The alignment specifiers can be separated by a comma or a space for better readability.
+
+### Line Control
+
+Whereas a simple `|` separator indicates a cell boundary, a double vertical bar `‖` in the separator row asks for a line to be drawn.
+
+This adds a left and and right border to the table:
+
+    | Col 1 | Col 2 | Col 3 |
+    ‖ ----- | ----- | ----- ‖
+    | A     | B     | C     |
+    
+`‖` only has an effect in the separator row and otherwise acts as a normal cell boundary; this adds no line:
+
+    ‖ Col 1 | Col 2 | Col 3 ‖
+    | ----- | ----- | ----- |
+    | A     | B     | C     |
 
 ## Build/Contribute
 
@@ -389,6 +420,6 @@ Use `make browserify`. To publish your fork after updading the package name, use
 
 ## License
 
-This software is licensed under the [MIT license][license] &copy; RedBug312.
+This software is licensed under the [MIT license][license] &copy; RedBug312, jppellet
 
 [license]: https://opensource.org/licenses/mit-license.php
