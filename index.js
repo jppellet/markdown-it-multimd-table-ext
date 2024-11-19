@@ -11,8 +11,13 @@ module.exports = function multimd_table_plugin(md, options) {
   };
   options = md.utils.assign({}, defaults, options || {});
 
+  /**
+   * @param {*} state
+   * @param {number} line
+   * @returns {[ number[], boolean[] ]} [ bounds, vlines ]
+   */
   function scan_bound_indices(state, line) {
-    /**
+    /*
      * Naming convention of positional variables
      * - list-item
      * ·········longtext······\n
@@ -68,6 +73,12 @@ module.exports = function multimd_table_plugin(md, options) {
     return [ bounds, vlines ];
   }
 
+  /**
+   * @param {*} state
+   * @param {boolean} silent
+   * @param {number} line
+   * @returns {{ text: string, label: string } | boolean }
+   */
   function table_caption(state, silent, line) {
     var meta = { text: null, label: null },
         start = state.bMarks[line] + state.sCount[line],
@@ -89,19 +100,25 @@ module.exports = function multimd_table_plugin(md, options) {
     return meta;
   }
 
+  /**
+   * @param {*} state
+   * @param {boolean} silent
+   * @param {number} line
+   * @returns {{ bounds: number[], multiline: boolean } | boolean }
+   */
   function table_row(state, silent, line) {
-    var meta = { bounds: null, multiline: null },
-        bounds = scan_bound_indices(state, line), vlines,
+    var meta = { bounds: null, multiline: null, vlines: null },
+        lineinfo = scan_bound_indices(state, line),
+        bounds,
         start, pos, oldMax;
 
-    vlines = bounds[1];
-    bounds = bounds[0];
+    bounds = lineinfo[0];
 
     if (bounds.length < 2) { return false; }
     if (silent) { return true; }
 
     meta.bounds = bounds;
-    meta.vlines = vlines;
+    meta.vlines = lineinfo[1];
 
     /* Multiline. Scan boundaries again since it's very complicated */
     if (options.multiline) {
@@ -121,14 +138,18 @@ module.exports = function multimd_table_plugin(md, options) {
     return meta;
   }
 
+  /**
+   * @param {*} state
+   * @param {boolean} silent
+   * @param {number} line
+   * @returns {{ aligns: string[], valigns: string[], wraps: boolean[], vlines: boolean[] } | boolean }
+   */
   function table_separator(state, silent, line) {
-    var meta = { aligns: [], valigns: [], wraps: [], vlines: null },
-        bounds = scan_bound_indices(state, line),
+    var lineinfo = scan_bound_indices(state, line),
+        bounds = lineinfo[0],
+        meta = { aligns: [], valigns: [], wraps: [], vlines: lineinfo[1] },
         sepRE = /^:?(\^|v)?(-+|=+):?\+?$/,
         c, text, align, first;
-
-    meta.vlines = bounds[1];
-    bounds = bounds[0];
 
     /* Only separator needs to check indents */
     if (state.sCount[line] - state.blkIndent >= 4) { return false; }
@@ -140,8 +161,8 @@ module.exports = function multimd_table_plugin(md, options) {
 
       meta.wraps.push(text.charCodeAt(text.length - 1) === 0x2B/* + */);
       first = text.charCodeAt(0);
-      align = ((first === 0x3A/* : */) << 4) |
-               (text.charCodeAt(text.length - 1 - meta.wraps[c]) === 0x3A);
+      align = (Number(first === 0x3A/* : */) << 4) |
+               Number(text.charCodeAt(text.length - 1 - meta.wraps[c]) === 0x3A);
       switch (align) {
         case 0x00: meta.aligns.push('');       break;
         case 0x01: meta.aligns.push('right');  break;
@@ -161,12 +182,25 @@ module.exports = function multimd_table_plugin(md, options) {
     return meta;
   }
 
+  /**
+   * @param {*} state
+   * @param {boolean} silent
+   * @param {number} line
+   * @returns {boolean}
+   */
   function table_empty(state, silent, line) {
     return state.isEmpty(line);
   }
 
+  /**
+   * @param {*} state
+   * @param {number} startLine
+   * @param {number} endLine
+   * @param {boolean} silent
+   * @returns {boolean}
+   */
   function table(state, startLine, endLine, silent) {
-    /**
+    /*
      * Regex pseudo code for table:
      *     caption? header+ separator (data+ empty)* data+ caption?
      *
