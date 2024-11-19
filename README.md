@@ -407,6 +407,15 @@ This adds a left and and right border to the table:
     | ----- | ----- | ----- |
     | A     | B     | C     |
 
+Complementarily, horizontal lines can be inserted in the middle of a table by having a line with hyphens `-` instead of actual cell contents (column boundaries are also allowed):
+
+    ‖ Col 1 | Col 2 | Col 3 ‖
+    | ----- | ----- | ----- |
+    | A     | B     | C     |
+    | ----- | ----- | ----- |
+    | D     | E     | F     |
+
+
 ## Build/Contribute
 
 Use `make browserify`. To publish your fork after updading the package name, use `npm publish`.

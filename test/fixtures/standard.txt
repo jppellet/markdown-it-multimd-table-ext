@@ -927,3 +927,60 @@ Vertical bars
 </tbody>
 </table>
 .
+
+
+Horizontal bars
+.
+| Left Border | No Border | No Border | Right Border |
+| ----------- | --------- | --------- | ------------ |
+| Content     | Content   | Content   | Content      |
+| ----------- | --------- | --------- | ------------ |
+| Content     | Content   | Content   | Content      |
+‖ -
+| Content     | Content   | Content   | Content      |
+--
+| Content     | Content   | Content   | Content      |
+.
+<table>
+<thead>
+<tr>
+<th>Left Border</th>
+<th>No Border</th>
+<th>No Border</th>
+<th>Right Border</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="border-bottom:1px solid">Content</td>
+<td style="border-bottom:1px solid">Content</td>
+<td style="border-bottom:1px solid">Content</td>
+<td style="border-bottom:1px solid">Content</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td style="border-bottom:1px solid">Content</td>
+<td style="border-bottom:1px solid">Content</td>
+<td style="border-bottom:1px solid">Content</td>
+<td style="border-bottom:1px solid">Content</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td style="border-bottom:1px solid">Content</td>
+<td style="border-bottom:1px solid">Content</td>
+<td style="border-bottom:1px solid">Content</td>
+<td style="border-bottom:1px solid">Content</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td>Content</td>
+<td>Content</td>
+<td>Content</td>
+<td>Content</td>
+</tr>
+</tbody>
+</table>
+.
