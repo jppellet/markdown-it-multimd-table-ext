@@ -458,6 +458,7 @@ module.exports = function multimd_table_plugin(md, options) {
           }
           // text
           text = match[3];
+
         }
 
         styleParts = [];
@@ -467,6 +468,7 @@ module.exports = function multimd_table_plugin(md, options) {
         if (valign) {
           styleParts.push('vertical-align:' + valign);
         }
+        token.meta = { halign: halign, valign: valign };
         if (tableToken.meta.sep.vlines[c]) {
           styleParts.push('border-left:1px solid');
         }
