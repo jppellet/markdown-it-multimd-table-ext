@@ -863,11 +863,14 @@ Overridden horizontal alignment of cells
 
 Mixed alignments
 .
-| Left           | Right          | Center          | Default       |
-| -------------- | -------------- | --------------- | ------------- |
-| [:- ^] Content | [-: ^] Content | [:-: ^] Content | [- ^] Content |
-| [:- =] Content | [-: =] Content | [:-: =] Content | [- =] Content |
-| [:- v] Content | [-: v] Content | [:-: v] Content | [- v] Content |
+| Left           | Right          | Center          | Default        |
+| -------------- | -------------- | --------------- | -------------- |
+| [:- ^] Content | [-: ^] Content | [:-: ^] Content | [- ^] Content  |
+| [:- =] Content | [-: =] Content | [:-: =] Content | [- =] Content  |
+| [:- v] Content | [-: v] Content | [:-: v] Content | [- v] Content  |
+| [<^]  Content  | [>^]  Content  | [>< ^] Content  | [<> ^] Content |
+| [<,=] Content  | [>,=] Content  | [>< =] Content  | [<> =] Content |
+| [<v]  Content  | [>v]  Content  | [>< v] Content  | [<> v] Content |
 .
 <table>
 <thead>
@@ -879,6 +882,24 @@ Mixed alignments
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;vertical-align:top">Content</td>
+<td style="text-align:right;vertical-align:top">Content</td>
+<td style="text-align:center;vertical-align:top">Content</td>
+<td style="vertical-align:top">Content</td>
+</tr>
+<tr>
+<td style="text-align:left;vertical-align:middle">Content</td>
+<td style="text-align:right;vertical-align:middle">Content</td>
+<td style="text-align:center;vertical-align:middle">Content</td>
+<td style="vertical-align:middle">Content</td>
+</tr>
+<tr>
+<td style="text-align:left;vertical-align:bottom">Content</td>
+<td style="text-align:right;vertical-align:bottom">Content</td>
+<td style="text-align:center;vertical-align:bottom">Content</td>
+<td style="vertical-align:bottom">Content</td>
+</tr>
 <tr>
 <td style="text-align:left;vertical-align:top">Content</td>
 <td style="text-align:right;vertical-align:top">Content</td>

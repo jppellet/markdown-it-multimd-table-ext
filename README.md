@@ -389,6 +389,12 @@ At the beginning of a cell, you can write `[<align>]` to set the alignment of th
     | [^] Top   | [v] Bottom | [=] Middle   | Content     |
     | [:-] Left | [-:] Right | [:-:] Center | [-] Default |
 
+Alternatively, one can use the following specifiers for horizontal alignment:
+
+    | Col 1    | Col 2     | Col 3       | Col 4        |
+    | -------- | --------- | ----------- |------------- |
+    | [<] Left | [>] Right | [><] Center | [<>] Default |
+
 When specifying both horizontal and vertical alignment, the horizontal alignment should be written first. The alignment specifiers can be separated by a comma or a space for better readability.
 
 ### Line Control

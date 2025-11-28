@@ -1,6 +1,6 @@
 {
   "name": "markdown-it-multimd-table-ext",
-  "version": "4.2.32",
+  "version": "4.2.33",
   "description": "Multimarkdown table syntax plugin for markdown-it markdown parser",
   "keywords": [
     "markdown-it-plugin",

@@ -104,7 +104,7 @@ module.exports = function multimd_table_plugin(md, options) {
    * @param {*} state
    * @param {boolean} silent
    * @param {number} line
-   * @returns {{ bounds: number[], multiline: boolean } | boolean }
+   * @returns {{ bounds: number[], multiline: boolean, vlines: null } | boolean }
    */
   function table_row(state, silent, line) {
     var meta = { bounds: null, multiline: null, vlines: null },
@@ -225,7 +225,7 @@ module.exports = function multimd_table_plugin(md, options) {
      */
     var tableDFA = new DFA(),
         grp = 0x10, mtr = -1,
-        alignOverrideRE = /^\[(:-|-:|-|:-:)?[ ,]?(v|\^|=)?\] ?(.*)$/,
+        alignOverrideRE = /^\[(:-|<|-:|>|-|<>|:-:|><)?[ ,]?(v|\^|=)?\] ?(.*)$/,
         match,
         token, tableToken, trToken,
         colspan, leftToken,
@@ -442,10 +442,10 @@ module.exports = function multimd_table_plugin(md, options) {
           if (match[1]) {
             // halign
             switch (match[1]) {
-              case ':-': halign = 'left'; break;
-              case '-:': halign = 'right'; break;
-              case ':-:': halign = 'center'; break;
-              case '-': default: halign = ''; break;
+              case ':-':  case '<':  halign = 'left'; break;
+              case '-:':  case '>':  halign = 'right'; break;
+              case ':-:': case '><': halign = 'center'; break;
+              case '-':   case '<>': default: halign = ''; break;
             }
           }
           if (match[2]) {
