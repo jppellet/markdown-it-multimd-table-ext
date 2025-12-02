@@ -142,14 +142,15 @@ module.exports = function multimd_table_plugin(md, options) {
    * @param {*} state
    * @param {boolean} silent
    * @param {number} line
-   * @returns {{ aligns: string[], valigns: string[], wraps: boolean[], vlines: boolean[] } | boolean }
+   * @returns {{ aligns: string[], valigns: string[], wraps: boolean[],
+   *           wrapscompact: boolean[], vlines: boolean[] } | boolean }
    */
   function table_separator(state, silent, line) {
     var lineinfo = scan_bound_indices(state, line),
         bounds = lineinfo[0],
-        meta = { aligns: [], valigns: [], wraps: [], vlines: lineinfo[1] },
-        sepRE = /^:?(\^|v)?(-+|=+):?\+?$/,
-        c, text, align, first;
+        meta = { aligns: [], valigns: [], wraps: [], wrapscompact:[], vlines: lineinfo[1] },
+        sepRE = /^:?(\^|v)?(-+|=+):?\+?-?$/,
+        c, text, align, first, wraps;
 
     /* Only separator needs to check indents */
     if (state.sCount[line] - state.blkIndent >= 4) { return false; }
@@ -159,7 +160,10 @@ module.exports = function multimd_table_plugin(md, options) {
       text = state.src.slice(bounds[c] + 1, bounds[c + 1]).trim();
       if (!sepRE.test(text)) { return false; }
 
-      meta.wraps.push(text.charCodeAt(text.length - 1) === 0x2B/* + */);
+      wraps = text.charCodeAt(text.length - 1) === 0x2B/* + */ ||
+              (text.length >= 2 && text.charCodeAt(text.length - 2) === 0x2B/* + */);
+      meta.wraps.push(wraps);
+      meta.wrapscompact.push(wraps && text.charCodeAt(text.length - 1) === 0x2D/* - */);
       first = text.charCodeAt(0);
       align = (Number(first === 0x3A/* : */) << 4) |
                Number(text.charCodeAt(text.length - 1 - meta.wraps[c]) === 0x3A);
